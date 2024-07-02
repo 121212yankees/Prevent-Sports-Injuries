@@ -8,3 +8,4 @@ Contact +1 (954)-909-9209 or ranveer.kapur01@yahoo.com for more.
 Code may have a high runtime, 6-30 minutes depending on sport and dates given.
 All databases used for player search found in code itself.
 Incomplete list of injuries not to be looked at near the end of each sport's code, could be added to.
+Commented out line at the end of each code to filter csv by injury instead of by name.
