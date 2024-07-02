@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Runtime high, ~6 minutes
 # Database found on https://www.kaggle.com/datasets/wyattowalsh/basketball?resource=download
-# Only uses injury data from 2012-2024
+# Only uses injury data from 2012-2024 (can be changed on line 11)
 
 # Base URL for scraping injury data
 base_url = "https://www.prosportstransactions.com/basketball/Search/SearchResults.php?Player=&Team=&BeginDate=2012-01-01&EndDate=2022-12-31&InjuriesChkBx=yes&Submit=Search&start="
