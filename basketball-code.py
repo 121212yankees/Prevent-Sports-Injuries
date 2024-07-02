@@ -5,6 +5,7 @@ from datetime import datetime
 
 # Runtime high, ~6 minutes
 # Database found on https://www.kaggle.com/datasets/wyattowalsh/basketball?resource=download
+# Only uses injury data from 2012-2024
 
 # Base URL for scraping injury data
 base_url = "https://www.prosportstransactions.com/basketball/Search/SearchResults.php?Player=&Team=&BeginDate=2012-01-01&EndDate=2022-12-31&InjuriesChkBx=yes&Submit=Search&start="
@@ -136,7 +137,7 @@ merged_data['Injury'] = merged_data['Injury'].str.replace(r'\s*\(DNP\)', '', reg
 # Remove specified injuries
 injuries_to_remove = [
     'ingrown', 'flu', 'surgery', 'itis', 'illness', 'cold', 'rest', 'food', 'headache',
-    'sinus', 'virus', 'viral', 'infection', 'COVID', 'NBA', 'tooth', 'conditioning', 'hernia'
+    'sinus', 'virus', 'viral', 'infection', 'COVID', 'NBA', 'tooth', 'conditioning', 'hernia', 'DNP'
 ]
 
 merged_data = merged_data[~merged_data['Injury'].str.contains('|'.join(injuries_to_remove), case=False)]
