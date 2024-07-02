@@ -4,7 +4,7 @@ import pandas as pd
 from io import StringIO
 import time
 
-# Used https://www.fangraphs.com/roster-resource/injury-report?timeframe=all&groupby=all&status=&injury=&season=2022 for injury reports
+# Used copied records from https://www.fangraphs.com/roster-resource/injury-report?timeframe=all&groupby=all&status=&injury=&season=2022 for injury reports
 # Now defunct, better method for baseball records was found 
 
 class TooManyRequests(Exception):
