@@ -1,0 +1,5 @@
+# Injury data taken from https://www.prosportstransactions.com/baseball/Search/Search.php
+# Two databases used for player data collection
+# https://www.retrosheet.org/biofile.htm for player height, weight, DOB, name, etc.
+# https://github.com/toddrob99/MLB-StatsAPI/blob/be8210d89e42625f1db22275d36bf3c6fb559b57/statsapi/endpoints.py for player positions
+# Runtime anywhere from 15-30 minutes based on selected injury data dates (changeable on line )
