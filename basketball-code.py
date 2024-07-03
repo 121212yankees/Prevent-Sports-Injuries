@@ -8,7 +8,7 @@ from datetime import datetime
 # Only uses injury data from 2012-2024 (can be changed on line 11)
 
 # Base URL for scraping injury data
-base_url = "https://www.prosportstransactions.com/basketball/Search/SearchResults.php?Player=&Team=&BeginDate=2012-01-01&EndDate=2022-12-31&InjuriesChkBx=yes&Submit=Search&start="
+base_url = "https://www.prosportstransactions.com/basketball/Search/SearchResults.php?Player=&Team=&BeginDate=2005-01-01&EndDate=2024-12-31&InjuriesChkBx=yes&Submit=Search&start="
 
 # Function to scrape a single page
 def scrape_page(url):
@@ -93,8 +93,16 @@ def calculate_days_out(df):
             if not return_rows.empty:
                 return_date = return_rows.iloc[0]['Date']
                 days_out = (return_date - injury_date).days
-                df.at[idx, 'Return date'] = return_date
-                df.at[idx, 'Days out'] = days_out
+                # Ensure the days out are reasonable
+                if 0 < days_out < 365:
+                    df.at[idx, 'Return date'] = return_date
+                    df.at[idx, 'Days out'] = days_out
+    return df
+
+# Ensure that if two or more injuries by the same player are listed on the same return date, keep only the one with the least days out
+def filter_least_days_out(df):
+    df = df.sort_values('Days out')
+    df = df.drop_duplicates(subset=['Player', 'Return date'], keep='first')
     return df
 
 merged_data = merged_data.groupby('Player', group_keys=False).apply(calculate_days_out)
@@ -103,27 +111,10 @@ merged_data = merged_data.groupby('Player', group_keys=False).apply(calculate_da
 merged_data = merged_data[['Player', 'position', 'height', 'weight', 'age', 'Date', 'Notes', 'Return date', 'Days out']]
 merged_data.rename(columns={'Notes': 'Injury', 'Date': 'Injury date'}, inplace=True)
 
-# Ensure at most one in every two entries has a value for Days Out
-def filter_days_out(df):
-    to_drop = []
-    previous_idx = None
-    for idx, row in df.iterrows():
-        if pd.notna(row['Days out']):
-            if previous_idx is not None:
-                to_drop.append(previous_idx)
-                previous_idx = None
-            else:
-                previous_idx = idx
-    df.drop(to_drop, inplace=True)
-    return df
-
-merged_data = merged_data.groupby('Player', group_keys=False).apply(filter_days_out)
+merged_data = merged_data.groupby('Player', group_keys=False).apply(filter_least_days_out)
 
 # Remove entries with blank Days Out
 merged_data = merged_data[merged_data['Days out'].notna()]
-
-# Remove duplicates with the same player name, injury, and return date, keeping the uppermost instance
-merged_data = merged_data.drop_duplicates(subset=['Player', 'Injury', 'Return date'], keep='first')
 
 # Clean up 'Return date' format
 merged_data['Return date'] = pd.to_datetime(merged_data['Return date']).dt.strftime('%Y-%m-%d')
@@ -131,19 +122,15 @@ merged_data['Return date'] = pd.to_datetime(merged_data['Return date']).dt.strft
 # Capitalize the first letter of all column headers
 merged_data.columns = [col.capitalize() for col in merged_data.columns]
 
-# Remove '(Dnp)' from all injuries if present
-merged_data['Injury'] = merged_data['Injury'].str.replace(r'\s*\(DNP\)', '', regex=True).str.strip()
+# Remove '(DNP)', '(DTD)', and '(out indefinitely)' from all injuries if present
+merged_data['Injury'] = merged_data['Injury'].str.replace(r'\s*\(DNP\)', '', regex=True).str.replace(r'\s*\(DTD\)', '', regex=True).str.replace(r'\s*\(out indefinitely\)', '', regex=True).str.strip()
 
 # Remove specified injuries
 injuries_to_remove = [
-    'ingrown', 'flu', 'surgery', 'itis', 'illness', 'cold', 'rest', 'food', 'headache',
-    'sinus', 'virus', 'viral', 'infection', 'COVID', 'NBA', 'tooth', 'conditioning', 'hernia', 'DNP'
+    'ingrown', 'flu', 'itis', 'illness', 'cold', 'rest', 'food', 'headache',
+    'sinus', 'virus', 'viral', 'infection', 'COVID', 'NBA', 'tooth', 'conditioning', 'hernia', 'kidney stones', 'fatigue', 'eye', 'undisclosed', 'throat'
 ]
-
 merged_data = merged_data[~merged_data['Injury'].str.contains('|'.join(injuries_to_remove), case=False)]
-
-# Uncomment the following line to sort by Injury alphabetically instead of Player
-# merged_data.sort_values('Injury', inplace=True)
 
 # Reorder columns
 merged_data = merged_data[['Player', 'Position', 'Injury', 'Injury date', 'Return date', 'Days out', 'Height', 'Weight', 'Age']]
