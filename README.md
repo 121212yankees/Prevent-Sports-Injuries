@@ -4,6 +4,7 @@ Injury data for the five major sports (Soccer, Football, Basketball, Baseball, H
 (Name, Age, Injury Date, Days Out, Height, Weight, Age, Etc.)
 ~2-3,000 injuries per sport.
 Injury history for all sports provided by https://www.prosportstransactions.com/, with player databases for each sport.
+All data extracted seperately for each sport.
 Contact +1 (954)-909-9209 or ranveer.kapur01@yahoo.com for more.
 Code may have a high runtime, 6-30 minutes depending on sport and dates given.
 All databases used for player search found in code itself.
